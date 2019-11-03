@@ -1,0 +1,31 @@
+{
+  "genesis_time": "2019-11-03T00:56:14.964331Z",
+  "chain_id": "test-chain-QXtvst",
+  "consensus_params": {
+    "block": {
+      "max_bytes": "22020096",
+      "max_gas": "-1",
+      "time_iota_ms": "1000"
+    },
+    "evidence": {
+      "max_age": "100000"
+    },
+    "validator": {
+      "pub_key_types": [
+        "ed25519"
+      ]
+    }
+  },
+  "validators": [
+    {
+      "address": "EED3210A6423D1FE0A6CE8943FD9476620BDD670",
+      "pub_key": {
+        "type": "tendermint/PubKeyEd25519",
+        "value": "eeZZpEmSMuZ3WlHc4IB0gmmyrabzxV9jLgBEyZNb82Y="
+      },
+      "power": "10",
+      "name": ""
+    }
+  ],
+  "app_hash": ""
+}
