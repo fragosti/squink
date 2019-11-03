@@ -1,0 +1,16 @@
+{
+  "name": "squonk",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "lotion": "^0.4.26",
+    "lotion-cli": "0.0.7",
+    "typescript": "^3.6.4"
+  }
+}
