@@ -283,7 +283,6 @@ export async function getTokenAllowance(address, tokenAddress, spenderAddress, l
 
 // amount must be a BigNumber, {base,display}Decimals must be Numbers
 export function amountFormatter(amount, baseDecimals = 18, displayDecimals = 3, useLessThan = true) {
-  debugger;
   if (baseDecimals > 18 || displayDecimals > 18 || displayDecimals > baseDecimals) {
     throw Error(`Invalid combination of baseDecimals '${baseDecimals}' and displayDecimals '${displayDecimals}.`)
   }
