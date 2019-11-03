@@ -70,7 +70,7 @@ export default function Header() {
         </Title>
       </HeaderElement>
       <HeaderElement>
-        <Web3Status />
+        {/* <Web3Status /> */}
       </HeaderElement>
     </HeaderFrame>
   )

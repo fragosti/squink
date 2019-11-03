@@ -33,7 +33,6 @@ const genesis = {
   }
 
 export const getBalances = async () => {
-    debugger;
     let { state, send } = await connect(null, {
         genesis: genesis,
         nodes: [ 'ws://localhost:26657' ]

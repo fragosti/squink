@@ -330,7 +330,7 @@ export default function CurrencyInputPanel({
     if (typeof renderInput === 'function') {
       return renderInput()
     }
-
+    console.log(selectedTokenAddress)
     return (
       <InputRow>
         <Input

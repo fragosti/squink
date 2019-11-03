@@ -96,7 +96,7 @@ export function useFetchAllBalances() {
   }
 
   const getTokenBalanceFromTendermint = async (k, account, library) => {
-    console.log(k);
+    // console.log(k);
   }
 
   useMemo(getData, [account])
