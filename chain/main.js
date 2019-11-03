@@ -5,14 +5,14 @@ let handler = require('./handler');
 let app = lotion({
 	initialState: {
 		fra: {
-			DAI: 1000000000000000000000,
-			USDC: 100000000000000000000,
-			TERRA: 100000000000000000000,
+			DAI: 10000 * Math.pow(10, 18),
+			USDC: 10000 * Math.pow(10, 18),
+			TERRA: 10000 * Math.pow(10, 18),
 		},
 		pool: {
-			DAI: 100030,
-			USDC: 1000,
-			TERRA: 100010,
+			DAI: 100030 * Math.pow(10, 18),
+			USDC: 1000 * Math.pow(10, 18),
+			TERRA: 100010 * Math.pow(10, 18),
 		}
 	},
 	p2pPort: 26658,                // port to use for tendermint peer connections
