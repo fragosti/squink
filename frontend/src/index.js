@@ -64,13 +64,3 @@ ReactDOM.render(
   </Web3Provider>,
   document.getElementById('root')
 )
-
-const start = async () => {
-  const { state, send } = await connect(null, {
-    genesis: require('./genesis.json'),
-    nodes: ['ws://localhost:26657'],
-  })
-  console.log(await state)
-  console.log(await send({ foo: 'bar' }))
-}
-start();

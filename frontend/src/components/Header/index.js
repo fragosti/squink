@@ -2,7 +2,6 @@ import React from 'react'
 import styled from 'styled-components'
 
 import { Link } from '../../theme'
-import Web3Status from '../Web3Status'
 import { darken } from 'polished'
 
 const HeaderFrame = styled.div`
