@@ -23,19 +23,19 @@ const ETH = {
 
 const INITIAL_TOKENS_CONTEXT = {
   1: {
-    '0x89d24A6b4CcB1B6fAA2625fE562bDD9a23260359': {
+    'DAI': {
       [NAME]: 'Dai Stablecoin v1.0',
       [SYMBOL]: 'DAI',
       [DECIMALS]: 18,
       [EXCHANGE_ADDRESS]: '0x09cabEC1eAd1c0Ba254B09efb3EE13841712bE14'
     },
-    '0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48': {
+    'USDC': {
       [NAME]: 'USD//C',
       [SYMBOL]: 'USDC',
       [DECIMALS]: 6,
       [EXCHANGE_ADDRESS]: '0x97deC872013f6B5fB443861090ad931542878126'
     },
-    '0x0000000000000000000000000000000000000000': {
+    'KRT': {
       [NAME]: 'KRT',
       [SYMBOL]: 'KRT',
       [DECIMALS]: 6,

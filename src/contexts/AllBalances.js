@@ -5,6 +5,7 @@ import { useWeb3Context } from 'web3-react'
 
 import { safeAccess, isAddress, getEtherBalance, getTokenBalance } from '../utils'
 import { useAllTokenDetails } from './Tokens'
+import { getBalances } from './Blockchain'
 
 const ZERO = ethers.utils.bigNumberify(0)
 const ONE = new BigNumber(1)
@@ -62,18 +63,19 @@ export function useFetchAllBalances() {
   const { allBalanceData } = safeAccess(state, [networkId, account]) || {}
 
   const getData = async () => {
-    if (!!library && !!account) {
+    getBalances()
+
+    if (!!library) {
       const newBalances = {}
       await Promise.all(
         Object.keys(allTokens).map(async k => {
           let balance = null
           let ethRate = null
-          if (isAddress(k) || k === 'ETH') {
             if (k === 'ETH') {
               balance = await getEtherBalance(account, library).catch(() => null)
               ethRate = ONE
             } else {
-              balance = await getTokenBalance(k, account, library).catch(() => null)
+              balance = await getTokenBalanceFromTendermint(k, account, library).catch(() => null)
               // only get values for tokens with positive balances
               if (!!balance && balance.gt(ZERO)) {
                 const tokenReserves = await getTokenReserves(k, library).catch(() => null)
@@ -87,11 +89,14 @@ export function useFetchAllBalances() {
             }
 
             return (newBalances[k] = { balance, ethRate })
-          }
         })
       )
       update(newBalances, networkId, account)
     }
+  }
+
+  const getTokenBalanceFromTendermint = async (k, account, library) => {
+    console.log(k);
   }
 
   useMemo(getData, [account])
