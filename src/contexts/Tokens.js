@@ -32,13 +32,13 @@ const INITIAL_TOKENS_CONTEXT = {
     'USDC': {
       [NAME]: 'USD//C',
       [SYMBOL]: 'USDC',
-      [DECIMALS]: 6,
+      [DECIMALS]: 18,
       [EXCHANGE_ADDRESS]: '0x97deC872013f6B5fB443861090ad931542878126'
     },
-    'KRT': {
+    'TERRA': {
       [NAME]: 'KRT',
       [SYMBOL]: 'KRT',
-      [DECIMALS]: 6,
+      [DECIMALS]: 18,
       [EXCHANGE_ADDRESS]: '0x97deC872013f6B5fB443861090ad931542878126'
     },
   },
