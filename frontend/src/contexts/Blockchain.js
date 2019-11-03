@@ -47,6 +47,7 @@ const getConnection = async () => {
 export const getBalances = async () => {
     let { state } = await getConnection();
     const res = await state
+    window.cachedState = res;
     return res;
 }
 

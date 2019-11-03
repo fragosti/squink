@@ -1,6 +1,7 @@
 import React, { useState, useReducer, useEffect } from 'react'
 import ReactGA from 'react-ga'
 import { createBrowserHistory } from 'history'
+import { BigNumber } from '@uniswap/sdk'
 
 import { useTranslation } from 'react-i18next'
 import { useWeb3Context } from 'web3-react'
@@ -194,30 +195,37 @@ function swapStateReducer(state, action) {
 }
 
 function getExchangeRate(inputValue, inputDecimals, outputValue, outputDecimals, invert = false) {
-  try {
-    if (
-      inputValue &&
-      (inputDecimals || inputDecimals === 0) &&
-      outputValue &&
-      (outputDecimals || outputDecimals === 0)
-    ) {
-      const factor = ethers.utils.bigNumberify(10).pow(ethers.utils.bigNumberify(18))
+  if (inputValue) {
+    const { pool } = window.cachedState;
+    const terra = new BigNumber(pool.TERRA);
+    const dai = new BigNumber(pool.DAI);
+    return terra.div(dai);
+  }
+  return new BigNumber(1);
+  // try {
+  //   if (
+  //     inputValue &&
+  //     (inputDecimals || inputDecimals === 0) &&
+  //     outputValue &&
+  //     (outputDecimals || outputDecimals === 0)
+  //   ) {
+  //     const factor = ethers.utils.bigNumberify(10).pow(ethers.utils.bigNumberify(18))
 
-      if (invert) {
-        return inputValue
-          .mul(factor)
-          .div(outputValue)
-          .mul(ethers.utils.bigNumberify(10).pow(ethers.utils.bigNumberify(outputDecimals)))
-          .div(ethers.utils.bigNumberify(10).pow(ethers.utils.bigNumberify(inputDecimals)))
-      } else {
-        return outputValue
-          .mul(factor)
-          .div(inputValue)
-          .mul(ethers.utils.bigNumberify(10).pow(ethers.utils.bigNumberify(inputDecimals)))
-          .div(ethers.utils.bigNumberify(10).pow(ethers.utils.bigNumberify(outputDecimals)))
-      }
-    }
-  } catch {}
+  //     if (invert) {
+  //       return inputValue
+  //         .mul(factor)
+  //         .div(outputValue)
+  //         .mul(ethers.utils.bigNumberify(10).pow(ethers.utils.bigNumberify(outputDecimals)))
+  //         .div(ethers.utils.bigNumberify(10).pow(ethers.utils.bigNumberify(inputDecimals)))
+  //     } else {
+  //       return outputValue
+  //         .mul(factor)
+  //         .div(inputValue)
+  //         .mul(ethers.utils.bigNumberify(10).pow(ethers.utils.bigNumberify(inputDecimals)))
+  //         .div(ethers.utils.bigNumberify(10).pow(ethers.utils.bigNumberify(outputDecimals)))
+  //     }
+  //   }
+  // } catch {}
 }
 
 function getMarketRate(
@@ -230,17 +238,11 @@ function getMarketRate(
   outputDecimals,
   invert = false
 ) {
-  if (swapType === ETH_TO_TOKEN) {
-    return getExchangeRate(outputReserveETH, 18, outputReserveToken, outputDecimals, invert)
-  } else if (swapType === TOKEN_TO_ETH) {
-    return getExchangeRate(inputReserveToken, inputDecimals, inputReserveETH, 18, invert)
-  } else if (swapType === TOKEN_TO_TOKEN) {
-    const factor = ethers.utils.bigNumberify(10).pow(ethers.utils.bigNumberify(18))
-    const firstRate = getExchangeRate(inputReserveToken, inputDecimals, inputReserveETH, 18)
-    const secondRate = getExchangeRate(outputReserveETH, 18, outputReserveToken, outputDecimals)
-    try {
-      return !!(firstRate && secondRate) ? firstRate.mul(secondRate).div(factor) : undefined
-    } catch {}
+  if (swapType === TOKEN_TO_TOKEN) {
+    const { pool } = window.cachedState;
+    const terra = new BigNumber(pool.TERRA);
+    const dai = new BigNumber(pool.DAI);
+    return terra.div(dai);
   }
 }
 
@@ -522,26 +524,26 @@ export default function ExchangePage({ initialCurrency, sending = false, params 
     outputReserveToken,
     outputDecimals
   )
+  
+  // const percentSlippage =
+  //   exchangeRate && marketRate
+  //     ? exchangeRate
+  //         .sub(marketRate)
+  //         .abs()
+  //         .mul(ethers.utils.bigNumberify(10).pow(ethers.utils.bigNumberify(18)))
+  //         .div(marketRate)
+  //         .sub(ethers.utils.bigNumberify(3).mul(ethers.utils.bigNumberify(10).pow(ethers.utils.bigNumberify(15))))
+  //     : undefined
+  // const percentSlippageFormatted = percentSlippage && amountFormatter(percentSlippage, 16, 2)
+  // const slippageWarning =
+  //   percentSlippage &&
+  //   percentSlippage.gte(ethers.utils.parseEther('.05')) &&
+  //   percentSlippage.lt(ethers.utils.parseEther('.2')) // [5% - 20%)
+  // const highSlippageWarning = percentSlippage && percentSlippage.gte(ethers.utils.parseEther('.2')) // [20+%
 
-  const percentSlippage =
-    exchangeRate && marketRate
-      ? exchangeRate
-          .sub(marketRate)
-          .abs()
-          .mul(ethers.utils.bigNumberify(10).pow(ethers.utils.bigNumberify(18)))
-          .div(marketRate)
-          .sub(ethers.utils.bigNumberify(3).mul(ethers.utils.bigNumberify(10).pow(ethers.utils.bigNumberify(15))))
-      : undefined
-  const percentSlippageFormatted = percentSlippage && amountFormatter(percentSlippage, 16, 2)
-  const slippageWarning =
-    percentSlippage &&
-    percentSlippage.gte(ethers.utils.parseEther('.05')) &&
-    percentSlippage.lt(ethers.utils.parseEther('.2')) // [5% - 20%)
-  const highSlippageWarning = percentSlippage && percentSlippage.gte(ethers.utils.parseEther('.2')) // [20+%
-
-  const isValid = sending
-    ? exchangeRate && inputError === null && independentError === null && recipientError === null
-    : exchangeRate && inputError === null && independentError === null
+  // const isValid = sending
+  //   ? exchangeRate && inputError === null && independentError === null && recipientError === null
+  //   : exchangeRate && inputError === null && independentError === null
 
   const estimatedText = `(${t('estimated')})`
   function formatBalance(value) {
@@ -549,86 +551,90 @@ export default function ExchangePage({ initialCurrency, sending = false, params 
   }
 
   async function onSwap() {
-    const deadline = Math.ceil(Date.now() / 1000) + DEADLINE_FROM_NOW
+    // const deadline = Math.ceil(Date.now() / 1000) + DEADLINE_FROM_NOW
 
-    let estimate, method, args, value
-    if (independentField === INPUT) {
-      ReactGA.event({
-        category: `${swapType}`,
-        action: sending ? 'TransferInput' : 'SwapInput'
-      })
+    // let estimate, method, args, value
+    // if (independentField === INPUT) {
+    //   ReactGA.event({
+    //     category: `${swapType}`,
+    //     action: sending ? 'TransferInput' : 'SwapInput'
+    //   })
 
-      if (swapType === ETH_TO_TOKEN) {
-        estimate = sending ? contract.estimate.ethToTokenTransferInput : contract.estimate.ethToTokenSwapInput
-        method = sending ? contract.ethToTokenTransferInput : contract.ethToTokenSwapInput
-        args = sending ? [dependentValueMinumum, deadline, recipient.address] : [dependentValueMinumum, deadline]
-        value = independentValueParsed
-      } else if (swapType === TOKEN_TO_ETH) {
-        estimate = sending ? contract.estimate.tokenToEthTransferInput : contract.estimate.tokenToEthSwapInput
-        method = sending ? contract.tokenToEthTransferInput : contract.tokenToEthSwapInput
-        args = sending
-          ? [independentValueParsed, dependentValueMinumum, deadline, recipient.address]
-          : [independentValueParsed, dependentValueMinumum, deadline]
-        value = ethers.constants.Zero
-      } else if (swapType === TOKEN_TO_TOKEN) {
-        estimate = sending ? contract.estimate.tokenToTokenTransferInput : contract.estimate.tokenToTokenSwapInput
-        method = sending ? contract.tokenToTokenTransferInput : contract.tokenToTokenSwapInput
-        args = sending
-          ? [
-              independentValueParsed,
-              dependentValueMinumum,
-              ethers.constants.One,
-              deadline,
-              recipient.address,
-              outputCurrency
-            ]
-          : [independentValueParsed, dependentValueMinumum, ethers.constants.One, deadline, outputCurrency]
-        value = ethers.constants.Zero
-      }
-    } else if (independentField === OUTPUT) {
-      ReactGA.event({
-        category: `${swapType}`,
-        action: sending ? 'TransferOutput' : 'SwapOutput'
-      })
+    //   if (swapType === ETH_TO_TOKEN) {
+    //     estimate = sending ? contract.estimate.ethToTokenTransferInput : contract.estimate.ethToTokenSwapInput
+    //     method = sending ? contract.ethToTokenTransferInput : contract.ethToTokenSwapInput
+    //     args = sending ? [dependentValueMinumum, deadline, recipient.address] : [dependentValueMinumum, deadline]
+    //     value = independentValueParsed
+    //   } else if (swapType === TOKEN_TO_ETH) {
+    //     estimate = sending ? contract.estimate.tokenToEthTransferInput : contract.estimate.tokenToEthSwapInput
+    //     method = sending ? contract.tokenToEthTransferInput : contract.tokenToEthSwapInput
+    //     args = sending
+    //       ? [independentValueParsed, dependentValueMinumum, deadline, recipient.address]
+    //       : [independentValueParsed, dependentValueMinumum, deadline]
+    //     value = ethers.constants.Zero
+    //   } else if (swapType === TOKEN_TO_TOKEN) {
+    //     estimate = sending ? contract.estimate.tokenToTokenTransferInput : contract.estimate.tokenToTokenSwapInput
+    //     method = sending ? contract.tokenToTokenTransferInput : contract.tokenToTokenSwapInput
+    //     args = sending
+    //       ? [
+    //           independentValueParsed,
+    //           dependentValueMinumum,
+    //           ethers.constants.One,
+    //           deadline,
+    //           recipient.address,
+    //           outputCurrency
+    //         ]
+    //       : [independentValueParsed, dependentValueMinumum, ethers.constants.One, deadline, outputCurrency]
+    //     value = ethers.constants.Zero
+    //   }
+    // } else if (independentField === OUTPUT) {
+    //   ReactGA.event({
+    //     category: `${swapType}`,
+    //     action: sending ? 'TransferOutput' : 'SwapOutput'
+    //   })
 
-      if (swapType === ETH_TO_TOKEN) {
-        estimate = sending ? contract.estimate.ethToTokenTransferOutput : contract.estimate.ethToTokenSwapOutput
-        method = sending ? contract.ethToTokenTransferOutput : contract.ethToTokenSwapOutput
-        args = sending ? [independentValueParsed, deadline, recipient.address] : [independentValueParsed, deadline]
-        value = dependentValueMaximum
-      } else if (swapType === TOKEN_TO_ETH) {
-        estimate = sending ? contract.estimate.tokenToEthTransferOutput : contract.estimate.tokenToEthSwapOutput
-        method = sending ? contract.tokenToEthTransferOutput : contract.tokenToEthSwapOutput
-        args = sending
-          ? [independentValueParsed, dependentValueMaximum, deadline, recipient.address]
-          : [independentValueParsed, dependentValueMaximum, deadline]
-        value = ethers.constants.Zero
-      } else if (swapType === TOKEN_TO_TOKEN) {
-        estimate = sending ? contract.estimate.tokenToTokenTransferOutput : contract.estimate.tokenToTokenSwapOutput
-        method = sending ? contract.tokenToTokenTransferOutput : contract.tokenToTokenSwapOutput
-        args = sending
-          ? [
-              independentValueParsed,
-              dependentValueMaximum,
-              ethers.constants.MaxUint256,
-              deadline,
-              recipient.address,
-              outputCurrency
-            ]
-          : [independentValueParsed, dependentValueMaximum, ethers.constants.MaxUint256, deadline, outputCurrency]
-        value = ethers.constants.Zero
-      }
-    }
+    //   if (swapType === ETH_TO_TOKEN) {
+    //     estimate = sending ? contract.estimate.ethToTokenTransferOutput : contract.estimate.ethToTokenSwapOutput
+    //     method = sending ? contract.ethToTokenTransferOutput : contract.ethToTokenSwapOutput
+    //     args = sending ? [independentValueParsed, deadline, recipient.address] : [independentValueParsed, deadline]
+    //     value = dependentValueMaximum
+    //   } else if (swapType === TOKEN_TO_ETH) {
+    //     estimate = sending ? contract.estimate.tokenToEthTransferOutput : contract.estimate.tokenToEthSwapOutput
+    //     method = sending ? contract.tokenToEthTransferOutput : contract.tokenToEthSwapOutput
+    //     args = sending
+    //       ? [independentValueParsed, dependentValueMaximum, deadline, recipient.address]
+    //       : [independentValueParsed, dependentValueMaximum, deadline]
+    //     value = ethers.constants.Zero
+    //   } else if (swapType === TOKEN_TO_TOKEN) {
+    //     estimate = sending ? contract.estimate.tokenToTokenTransferOutput : contract.estimate.tokenToTokenSwapOutput
+    //     method = sending ? contract.tokenToTokenTransferOutput : contract.tokenToTokenSwapOutput
+    //     args = sending
+    //       ? [
+    //           independentValueParsed,
+    //           dependentValueMaximum,
+    //           ethers.constants.MaxUint256,
+    //           deadline,
+    //           recipient.address,
+    //           outputCurrency
+    //         ]
+    //       : [independentValueParsed, dependentValueMaximum, ethers.constants.MaxUint256, deadline, outputCurrency]
+    //     value = ethers.constants.Zero
+    //   }
+    // }
 
-    const estimatedGasLimit = await estimate(...args, { value })
-    method(...args, { value, gasLimit: calculateGasMargin(estimatedGasLimit, GAS_MARGIN) }).then(response => {
-      addTransaction(response)
-    })
+    // const estimatedGasLimit = await estimate(...args, { value })
+    // method(...args, { value, gasLimit: calculateGasMargin(estimatedGasLimit, GAS_MARGIN) }).then(response => {
+    //   addTransaction(response)
+    // })
   }
 
   const [customSlippageError, setcustomSlippageError] = useState('')
 
   const allBalances = useFetchAllBalances()
+  const isValid = true;
+  const slippageWarning = null;
+  const highSlippageWarning = null;
+  const percentSlippageFormatted = null;
 
   return (
     <>
@@ -685,7 +691,7 @@ export default function ExchangePage({ initialCurrency, sending = false, params 
         }}
         selectedTokens={[inputCurrency, outputCurrency]}
         selectedTokenAddress={outputCurrency}
-        value={outputValueFormatted}
+        value={ inputValueParsed ? '1.0145' : outputValueFormatted}
         errorMessage={independentField === OUTPUT ? independentError : ''}
         disableUnlock
       />
