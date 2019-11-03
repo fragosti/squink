@@ -187,7 +187,7 @@ export default function WalletModal({ isOpen, error, onDismiss, pendingTransacti
       return (
         <>
           <UpperSection>
-            <h4>No Ethereum account found</h4>
+            <h4>Connected to Tendermint-powered chain 🌍</h4>
             <h5>Please visit this page in a Web3 enabled browser.</h5>
             <h5>
               <Link href={'https://ethereum.org/use/#_3-what-is-a-wallet-and-which-one-should-i-use'}>
