@@ -63,32 +63,14 @@ export function useFetchAllBalances() {
   const { allBalanceData } = safeAccess(state, [networkId, account]) || {}
 
   const getData = async () => {
-    getBalances()
 
     if (!!library) {
       const newBalances = {}
       await Promise.all(
         Object.keys(allTokens).map(async k => {
-          let balance = null
+          let balance = await getTokenBalanceFromTendermint(k, account, library);
           let ethRate = null
-            if (k === 'ETH') {
-              balance = await getEtherBalance(account, library).catch(() => null)
-              ethRate = ONE
-            } else {
-              balance = await getTokenBalanceFromTendermint(k, account, library).catch(() => null)
-              // only get values for tokens with positive balances
-              if (!!balance && balance.gt(ZERO)) {
-                const tokenReserves = await getTokenReserves(k, library).catch(() => null)
-                if (!!tokenReserves) {
-                  const marketDetails = getMarketDetails(tokenReserves)
-                  if (marketDetails.marketRate && marketDetails.marketRate.rate) {
-                    ethRate = marketDetails.marketRate.rate
-                  }
-                }
-              }
-            }
-
-            return (newBalances[k] = { balance, ethRate })
+          return (newBalances[k] = { balance, ethRate })
         })
       )
       update(newBalances, networkId, account)
@@ -96,7 +78,8 @@ export function useFetchAllBalances() {
   }
 
   const getTokenBalanceFromTendermint = async (k, account, library) => {
-    console.log(k);
+    const balances = await getBalances()
+    return new BigNumber(balances.fra[k]);
   }
 
   useMemo(getData, [account])

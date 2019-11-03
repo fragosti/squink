@@ -1,8 +1,8 @@
 let connect = require('lotion-connect')
 
 const genesis = {
-    "genesis_time": "2019-11-03T07:27:56.902671Z",
-    "chain_id": "test-chain-O1niRD",
+    "genesis_time": "2019-11-03T15:19:09.522358Z",
+    "chain_id": "test-chain-2KwKKo",
     "consensus_params": {
       "block": {
         "max_bytes": "22020096",
@@ -20,10 +20,10 @@ const genesis = {
     },
     "validators": [
       {
-        "address": "5990D63295DEB05BB89614E6D36A2B2327EE1AAF",
+        "address": "A9C7F84A8A95D3FACD73D586E6EE1EF1D95D5649",
         "pub_key": {
           "type": "tendermint/PubKeyEd25519",
-          "value": "6xQMP2zjrbQevZdB+rxapeQ7EWtlkmJKTa/6789rakA="
+          "value": "6oJKIwVVPbLV6Sl7BG2zFd+sJh7AKDlvtGUxwWbszAU="
         },
         "power": "10",
         "name": ""
@@ -32,12 +32,30 @@ const genesis = {
     "app_hash": ""
   }
 
+let connection = null;
+
+const getConnection = async () => {
+    if (connection === null) {
+        connection = await connect(null, {
+            genesis: genesis,
+            nodes: ['ws://localhost:26657']
+        });
+    }
+    return connection
+}
+
 export const getBalances = async () => {
+    let { state } = await getConnection();
+    const res = await state
+    return res;
+}
+
+export const trade = async () => {
     debugger;
-    let { state, send } = await connect(null, {
+    let { state } = await connect(null, {
         genesis: genesis,
         nodes: [ 'ws://localhost:26657' ]
       });
     const res = await state
-    console.log(res);
+    return res;
 }

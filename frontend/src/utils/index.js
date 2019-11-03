@@ -312,7 +312,7 @@ export function amountFormatter(amount, baseDecimals = 18, displayDecimals = 3, 
     }
     // if the balance is greater than the minimum display amount
     else {
-      const stringAmount = ethers.utils.formatUnits(amount, baseDecimals)
+      const stringAmount = amount.div(Math.pow(10, baseDecimals)).toString()
 
       // if there isn't a decimal portion
       if (!stringAmount.match(/\./)) {
